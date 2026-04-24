@@ -216,3 +216,207 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 - Add request tracing: correlation IDs across API → Celery → storage
 - Add structured request logging middleware: method, path, status, latency, request_id on every request
 - Export metrics to Prometheus-compatible endpoint: request count, latency histogram, active DB connections, scraper signal counts
+
+---
+
+## v7 Sprint: Two-Sided Marketplace — Sellers & Printers
+
+**Priority: High — transforms Forge from a solo tool into a print fulfillment network**
+
+### Concept
+
+Forge becomes a two-sided marketplace with three roles:
+
+- **Admin** (you) — operates the platform, manages both sides, sees everything
+- **Sellers** — connect marketplace accounts (Etsy, Shopify, etc.), create listings, generate orders. They never touch a printer.
+- **Printers** — own 3D printers, browse a job queue, accept jobs that match their hardware, print and ship for a payout. They never touch a marketplace.
+
+The Forge backend orchestrates matching, payouts, quality control, and dispute resolution between both sides.
+
+### User Flows
+
+**Printer Onboarding:**
+1. Signs up → creates profile (name, location, shipping zip)
+2. Adds printer(s): brand, model, build volume, nozzle sizes, supported materials
+3. Sets filament inventory: colors/materials on hand, auto-updates as jobs complete
+4. Sets preferences: minimum payout per job ($), max print time, preferred categories, shipping radius
+5. Sees a personalized job queue filtered by compatibility + preferences
+
+**Seller Onboarding:**
+1. Signs up → creates profile (shop name, business info)
+2. Connects marketplace account(s) via store connectors (already built)
+3. Uploads/generates designs (STL/3MF) with print specs (material, color options, infill, supports)
+4. Sets retail price → platform calculates printer payout after fees
+5. Orders flow in from connected stores automatically
+
+**Job Lifecycle:**
+```
+Order received → Job created → Queued (matching) → Offered to compatible Printers
+→ Printer accepts → Printing → QA photo upload → Shipped (tracking entered)
+→ Delivered → Payout released (after return window)
+```
+
+### Data Model Changes
+
+**Modified tables:**
+
+`operator` — add:
+- `role` expanded: "admin" | "seller" | "printer" (currently "owner" | "printer_operator")
+- `display_name`, `avatar_url`, `location_zip` (nullable)
+- `stripe_connect_id` (nullable, for printer payouts)
+- `onboarding_completed` (bool, default false)
+- `preferences_json` (nullable): min_payout_c, max_print_time_hrs, preferred_categories, shipping_radius_miles
+
+`printer` — add:
+- `brand` (string — "bambu", "prusa", "creality", "elegoo", etc.)
+- `nozzle_sizes_json` (list of floats, e.g. [0.4, 0.6])
+- `supported_materials_json` (list, e.g. ["PLA", "PETG", "TPU"])
+- `max_build_mm_json` (e.g. {"x": 256, "y": 256, "z": 256})
+- `hourly_rate_c` (int, printer's cost per hour — used for payout calculation)
+- `is_available` (bool, default true — printer can toggle availability)
+
+`order` — add:
+- `seller_id` (FK to operator)
+- `printer_operator_id` (FK to operator, nullable — assigned when accepted)
+- `commission_c` (int — platform fee in cents)
+- `printer_payout_c` (int — what the printer earns)
+
+**New tables:**
+
+`job_offer` — when a job is created, it's offered to N compatible printers
+- id, print_job_id (FK), printer_operator_id (FK), offered_at, expires_at
+- status: "pending" | "accepted" | "declined" | "expired"
+- payout_c (int — what this printer would earn)
+
+`payout` — tracks money owed/paid to printers
+- id, printer_operator_id (FK), print_job_id (FK)
+- amount_c (int), status: "pending" | "hold" | "released" | "paid"
+- hold_until (timestamptz — release after return window, e.g. 7 days)
+- stripe_transfer_id (nullable)
+- created_at
+
+`design_spec` — print requirements attached to each design
+- id, design_id (FK)
+- material_required (string, e.g. "PLA")
+- color_options_json (list of hex codes)
+- infill_pct (int, default 20)
+- supports_required (bool)
+- min_wall_mm (float)
+- estimated_grams (float)
+- estimated_time_minutes (int)
+- min_build_x_mm, min_build_y_mm, min_build_z_mm (ints)
+
+`shipment` — tracks shipping per job
+- id, print_job_id (FK), carrier, tracking_no, label_url
+- shipped_at, delivered_at
+- cost_c (int — shipping cost)
+
+### Pricing & Payout Model
+
+```
+Retail price (set by Seller)                           $25.00
+  - Marketplace fee (Etsy ~6.5%, Shopify ~2.9%)        -$1.63
+  - Platform fee (Forge, configurable, default 15%)    -$3.75
+  - Shipping cost (from carrier API)                   -$4.50
+  = Printer payout                                     $15.12
+```
+
+- Payouts held for 7 days after delivery (return window)
+- Released automatically if no dispute
+- Stripe Connect for actual money movement (future — start with manual tracking)
+- Minimum payout threshold: $5.00 per job (configurable by printer)
+
+### Job Matching Algorithm
+
+When an order comes in:
+1. Look up the design's `design_spec` (material, build volume, color)
+2. Query all printers where:
+   - `is_available = true`
+   - `supported_materials_json` contains required material
+   - `max_build_mm_json` fits the design dimensions
+   - Printer has the required color in `filament_spool` inventory
+   - Printer's `preferences_json.min_payout_c` <= calculated payout
+   - Printer's `preferences_json.max_print_time_hrs` >= estimated time
+   - Printer's `preferences_json.shipping_radius_miles` covers the buyer's zip (if set)
+3. Rank by: past success rate > proximity to buyer > queue depth > hourly rate
+4. Create `job_offer` rows for top 3-5 printers
+5. First to accept gets the job (offers expire after 4 hours)
+6. If no one accepts, re-offer to next batch or alert admin
+
+### UI — Printer Dashboard
+
+**Job Queue** (`/jobs`)
+- Filterable list of available jobs matching the printer's capabilities
+- Each job card shows:
+  - Product thumbnail (render from design)
+  - Material & color required
+  - Estimated print time & filament usage (grams)
+  - Payout amount (after all fees)
+  - Shipping destination (city/state only, no full address until accepted)
+  - Compatibility badges: printer model match, material match, color match
+  - "Accept Job" button with payout confirmation
+- Filters: min payout, material, print time, sort by (payout, time, newest)
+
+**My Jobs** (`/my-jobs`)
+- Accepted jobs in progress: status timeline (accepted → printing → QA → shipped)
+- Upload QA photo (required before marking as shipped)
+- Enter tracking number → auto-notifies seller and buyer
+- Payout status per job (hold → released → paid)
+
+**Printer Profile** (`/profile`)
+- Edit printers: add/remove, update specs and availability
+- Filament inventory management: add spools, track usage
+- Payout preferences: minimum per job, preferred categories
+- Earnings summary: total earned, pending, paid out
+
+### UI — Seller Dashboard
+
+- Existing Forge dashboard (opportunities, designs, listings)
+- New: **Orders** page enhanced with fulfillment status from printer side
+- New: tracking auto-populated when printer ships
+- New: earnings/cost breakdown per order (retail - fees - payout = margin)
+
+### UI — Admin Dashboard
+
+- Everything both sides see, plus:
+- **Operator management**: view all sellers and printers, approve/suspend accounts
+- **Job oversight**: see all jobs, reassign, resolve disputes
+- **Platform financials**: total GMV, total fees collected, total payouts, margin
+- **Matching health**: acceptance rate, avg time to accept, expiration rate
+
+### Security & Trust
+
+- Printers never see buyer PII (name, full address) until they accept a job
+- After acceptance: shipping label generated server-side, printer gets label PDF (not raw address)
+- QA photo required before shipping — prevents empty box fraud
+- Seller can dispute within 7 days of delivery → payout held during review
+- Admin can force-release or force-refund any payout
+- Rate limiting on job acceptance (prevent one printer from hoarding)
+- Printer reputation score based on: on-time rate, QA pass rate, dispute rate
+
+### Sprint Sequencing (6 weeks)
+
+| Week | Deliverable |
+|------|-------------|
+| 1 | Expand operator model (roles, preferences, onboarding), design_spec table, job_offer table |
+| 2 | Payout + shipment tables, pricing engine (retail → payout calculation), job matching algorithm |
+| 3 | Printer dashboard: job queue, accept flow, profile/printer management |
+| 4 | Seller dashboard enhancements: order fulfillment tracking, cost breakdown |
+| 5 | Admin dashboard: operator management, job oversight, platform financials |
+| 6 | QA photo upload flow, dispute handling, payout hold/release logic, integration testing |
+
+### Files to create/modify
+- Modified: `apps/api/app/models/operator.py` — expanded roles, preferences, stripe
+- Modified: `apps/api/app/models/printer.py` — brand, materials, nozzle, availability
+- Modified: `apps/api/app/models/order.py` — seller_id, printer_operator_id, commission, payout
+- New: `apps/api/app/models/job_offer.py`
+- New: `apps/api/app/models/payout.py`
+- New: `apps/api/app/models/design_spec.py`
+- New: `apps/api/app/models/shipment.py`
+- New: `apps/api/app/services/pricing.py` — payout calculator
+- New: `apps/api/app/services/matcher.py` — job matching algorithm
+- New: `apps/api/app/routers/jobs.py` — printer-facing job queue + accept
+- New: `apps/api/app/routers/payouts.py` — payout tracking
+- New: `apps/web/src/app/jobs/` — printer job queue UI
+- New: `apps/web/src/app/my-jobs/` — printer active jobs UI
+- New: `apps/web/src/app/profile/` — printer profile management
