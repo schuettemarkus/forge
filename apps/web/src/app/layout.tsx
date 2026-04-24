@@ -31,7 +31,7 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <QueryProvider>
           <Sidebar />
-          <main className="min-h-screen pt-14 px-4 pb-6 lg:pt-0 lg:ml-56 lg:p-6">
+          <main className="min-h-screen pt-18 px-4 pb-8 lg:pt-8 lg:ml-56 lg:px-8 lg:pb-8">
             {children}
           </main>
         </QueryProvider>

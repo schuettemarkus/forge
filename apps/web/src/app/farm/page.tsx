@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Cpu,
   Plus,
@@ -15,10 +16,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export default function FarmPage() {
+  const searchParams = useSearchParams();
   const { data: printers = [], isLoading } = usePrinters();
   const createPrinter = useCreatePrinter();
   const deletePrinter = useDeletePrinter();
   const [showAdd, setShowAdd] = useState(false);
+
+  // Auto-open form when linked from settings with ?add=1
+  useEffect(() => {
+    if (searchParams.get("add") === "1") {
+      setShowAdd(true);
+    }
+  }, [searchParams]);
 
   return (
     <div className="max-w-4xl mx-auto">
