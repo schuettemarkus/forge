@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import auth, health, opportunities
+from app.routers import auth, health, opportunities, trends, scoring
 
 structlog.configure(
     processors=[
@@ -51,3 +51,5 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(opportunities.router, prefix="/opportunities", tags=["opportunities"])
+app.include_router(trends.router, prefix="/trends", tags=["trends"])
+app.include_router(scoring.router, prefix="/scoring", tags=["scoring"])
