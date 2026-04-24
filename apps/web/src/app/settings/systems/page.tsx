@@ -117,7 +117,7 @@ export default function SystemsPage() {
       </div>
 
       {/* Overall Status Banner */}
-      <div className={`glass rounded-2xl p-5 mb-6 flex items-center gap-4 ${
+      <div className={`glass rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 ${
         overallStatus === "healthy" ? "glow-amber" : ""
       }`}>
         {overallStatus === "healthy" ? (
@@ -146,7 +146,7 @@ export default function SystemsPage() {
           </p>
         </div>
         {health && (
-          <div className="ml-auto text-right">
+          <div className="sm:ml-auto sm:text-right">
             <span className="text-xs text-muted-foreground">Version</span>
             <p className="text-sm font-mono">{health.version}</p>
           </div>

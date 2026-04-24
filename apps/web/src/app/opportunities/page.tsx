@@ -77,27 +77,25 @@ export default function OpportunitiesPage() {
   };
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 p-2.5">
-              <Lightbulb className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Opportunities</h1>
-              <p className="text-sm text-muted-foreground">
-                {opportunities.length} product ideas ranked by potential
-              </p>
-            </div>
+      <div className="mb-6 lg:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 p-2.5">
+            <Lightbulb className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold">Opportunities</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {opportunities.length} product ideas ranked by potential
+            </p>
           </div>
         </div>
         <Button
           onClick={triggerScrape}
           disabled={scraping}
           size="sm"
-          className="rounded-xl"
+          className="rounded-xl w-full sm:w-auto"
         >
           <RefreshCw className={`mr-2 h-3.5 w-3.5 ${scraping ? "animate-spin" : ""}`} />
           {scraping ? "Scanning..." : "Scan Trends"}
@@ -136,7 +134,7 @@ export default function OpportunitiesPage() {
             return (
               <div
                 key={opp.id}
-                className={`glass rounded-2xl p-5 transition-all duration-200 cursor-pointer ${
+                className={`glass rounded-2xl p-4 sm:p-5 transition-all duration-200 cursor-pointer ${
                   isSelected ? "ring-1 ring-primary/40 glow-amber" : "hover:bg-white/5"
                 }`}
                 onClick={() => {
@@ -144,14 +142,14 @@ export default function OpportunitiesPage() {
                   setExpanded(isExpanded ? null : opp.id);
                 }}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   {/* Score ring */}
-                  <ScoreRing score={opp.score} max={10} size={52} />
+                  <ScoreRing score={opp.score} max={10} size={44} className="shrink-0 mt-0.5 sm:mt-0" />
 
                   {/* Main content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold capitalize truncate">
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <h3 className="font-semibold capitalize text-sm sm:text-base truncate max-w-[200px] sm:max-w-none">
                         {opp.concept}
                       </h3>
                       <Badge
@@ -162,28 +160,39 @@ export default function OpportunitiesPage() {
                     </div>
 
                     {/* Metric pills */}
-                    <div className="flex flex-wrap gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs text-muted-foreground">
                         <TrendingUp className="h-3 w-3 text-primary" />
-                        {opp.demand.toFixed(0)} demand
+                        {opp.demand.toFixed(0)}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs text-muted-foreground">
                         <Shield className="h-3 w-3 text-secondary" />
-                        {opp.competition.toFixed(1)} competition
+                        {opp.competition.toFixed(1)}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs text-muted-foreground">
                         <Printer className="h-3 w-3 text-accent" />
                         {getPrintabilityLabel(opp.printability)}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs text-muted-foreground">
                         <DollarSign className="h-3 w-3 text-success" />
-                        {opp.margin_est.toFixed(0)}% margin
+                        {opp.margin_est.toFixed(0)}%
                       </span>
+                    </div>
+
+                    {/* Mobile actions */}
+                    <div className="flex items-center gap-2 mt-3 sm:hidden">
+                      <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 flex-1">
+                        <Sparkles className="mr-1.5 h-3 w-3" />
+                        Design
+                      </Button>
+                      <button className="p-1.5 rounded-lg bg-white/5 text-muted-foreground hover:text-foreground transition-colors">
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </button>
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  {/* Desktop actions */}
+                  <div className="hidden sm:flex items-center gap-2 shrink-0">
                     <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90">
                       <Sparkles className="mr-1.5 h-3 w-3" />
                       Design
@@ -206,8 +215,8 @@ export default function OpportunitiesPage() {
         </div>
       )}
 
-      {/* Keyboard hints */}
-      <div className="mt-6 flex gap-4 text-[11px] text-muted-foreground/40">
+      {/* Keyboard hints — desktop only */}
+      <div className="mt-6 hidden sm:flex gap-4 text-[11px] text-muted-foreground/40">
         <span>
           <kbd className="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[10px]">J</kbd>
           <kbd className="ml-0.5 rounded bg-white/5 px-1.5 py-0.5 font-mono text-[10px]">K</kbd>

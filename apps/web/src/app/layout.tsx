@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Sidebar } from "@/components/sidebar";
 import "./globals.css";
@@ -13,6 +13,13 @@ export const metadata: Metadata = {
   description: "Autonomous 3D-printing micro-business operator dashboard",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -22,7 +29,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.variable} antialiased`}>
         <Sidebar />
-        <main className="ml-56 min-h-screen p-6">{children}</main>
+        <main className="min-h-screen pt-14 px-4 pb-6 lg:pt-0 lg:ml-56 lg:p-6">
+          {children}
+        </main>
       </body>
     </html>
   );
