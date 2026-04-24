@@ -82,7 +82,7 @@ export default function OpportunitiesPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 p-2.5">
+            <div className="rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 p-2.5">
               <Lightbulb className="h-5 w-5 text-primary" />
             </div>
             <div>
@@ -117,7 +117,7 @@ export default function OpportunitiesPage() {
         </div>
       ) : opportunities.length === 0 ? (
         <div className="glass rounded-2xl p-16 text-center">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
             <Sparkles className="h-8 w-8 text-primary/60" />
           </div>
           <p className="text-lg font-medium text-foreground/80">
@@ -137,7 +137,7 @@ export default function OpportunitiesPage() {
               <div
                 key={opp.id}
                 className={`glass rounded-2xl p-5 transition-all duration-200 cursor-pointer ${
-                  isSelected ? "ring-1 ring-primary/40 glow-pink" : "hover:bg-white/5"
+                  isSelected ? "ring-1 ring-primary/40 glow-amber" : "hover:bg-white/5"
                 }`}
                 onClick={() => {
                   setSelected(i);
@@ -184,7 +184,7 @@ export default function OpportunitiesPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
-                    <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+                    <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90">
                       <Sparkles className="mr-1.5 h-3 w-3" />
                       Design
                     </Button>
@@ -236,7 +236,7 @@ function RationaleView({ rationale }: { rationale: string }) {
     <div className="space-y-3">
       {/* Recommendation callout */}
       {recText && (
-        <div className="rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 p-3 text-sm">
+        <div className="rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 p-3 text-sm">
           <span className="font-medium text-foreground/90">{recText}</span>
         </div>
       )}

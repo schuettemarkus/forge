@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="face-top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#E8852A" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="face-left" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#D97A1E" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#B8621A" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="face-right" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#D4851F" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="edge-glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#E8852A" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cube faces — transparent with subtle fill -->
+  <!-- Top face -->
+  <polygon points="60,20 100,40 60,60 20,40" fill="url(#face-top)"/>
+  <!-- Left face -->
+  <polygon points="20,40 60,60 60,100 20,80" fill="url(#face-left)"/>
+  <!-- Right face -->
+  <polygon points="100,40 60,60 60,100 100,80" fill="url(#face-right)"/>
+
+  <!-- Edges — the wireframe look -->
+  <!-- Top edges -->
+  <line x1="60" y1="20" x2="100" y2="40" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="60" y1="20" x2="20" y2="40" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="20" y1="40" x2="60" y2="60" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.6"/>
+  <line x1="100" y1="40" x2="60" y2="60" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.6"/>
+
+  <!-- Vertical edges -->
+  <line x1="20" y1="40" x2="20" y2="80" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="100" y1="40" x2="100" y2="80" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="60" y1="60" x2="60" y2="100" stroke="url(#edge-glow)" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.4"/>
+
+  <!-- Bottom edges -->
+  <line x1="20" y1="80" x2="60" y2="100" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="100" y1="80" x2="60" y2="100" stroke="url(#edge-glow)" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Top vertex highlight — the "print nozzle" dot -->
+  <circle cx="60" cy="20" r="2.5" fill="#F5A623" opacity="0.9"/>
+
+  <!-- Subtle inner glow -->
+  <polygon points="60,20 100,40 60,60 20,40" fill="#F5A623" opacity="0.03"/>
+</svg>

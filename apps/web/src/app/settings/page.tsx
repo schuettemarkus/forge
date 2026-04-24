@@ -15,7 +15,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-8 flex items-center gap-3">
-        <div className="rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 p-2.5">
+        <div className="rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 p-2.5">
           <Settings className="h-5 w-5 text-primary" />
         </div>
         <div>

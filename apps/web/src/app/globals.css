@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  /* Instagram-inspired palette */
-  --color-background: oklch(0.13 0.02 280);
-  --color-foreground: oklch(0.97 0.005 280);
-  --color-card: oklch(0.18 0.015 280 / 0.6);
-  --color-card-foreground: oklch(0.97 0.005 280);
-  --color-card-solid: oklch(0.18 0.015 280);
-  --color-primary: oklch(0.65 0.25 330);
-  --color-primary-foreground: oklch(1 0 0);
-  --color-secondary: oklch(0.65 0.22 290);
-  --color-accent: oklch(0.72 0.2 50);
-  --color-muted: oklch(0.25 0.015 280 / 0.5);
-  --color-muted-foreground: oklch(0.6 0.02 280);
-  --color-destructive: oklch(0.6 0.24 25);
-  --color-border: oklch(0.3 0.02 280 / 0.4);
-  --color-ring: oklch(0.65 0.25 330);
-  --color-warning: oklch(0.77 0.17 65);
-  --color-success: oklch(0.7 0.18 155);
+  /* Forge palette — amber fire + steel blue */
+  --color-background: oklch(0.14 0.01 250);
+  --color-foreground: oklch(0.95 0.005 250);
+  --color-card: oklch(0.19 0.01 250 / 0.55);
+  --color-card-foreground: oklch(0.95 0.005 250);
+  --color-card-solid: oklch(0.19 0.01 250);
+  --color-primary: oklch(0.75 0.17 65);
+  --color-primary-foreground: oklch(0.15 0.02 60);
+  --color-secondary: oklch(0.62 0.12 230);
+  --color-accent: oklch(0.7 0.15 45);
+  --color-muted: oklch(0.26 0.01 250 / 0.5);
+  --color-muted-foreground: oklch(0.58 0.015 250);
+  --color-destructive: oklch(0.6 0.22 25);
+  --color-border: oklch(0.32 0.01 250 / 0.4);
+  --color-ring: oklch(0.75 0.17 65);
+  --color-warning: oklch(0.77 0.15 70);
+  --color-success: oklch(0.7 0.16 155);
 
-  /* Gradient stops */
-  --color-grad-pink: oklch(0.6 0.28 340);
-  --color-grad-purple: oklch(0.5 0.25 290);
-  --color-grad-orange: oklch(0.7 0.2 50);
-  --color-grad-yellow: oklch(0.8 0.18 85);
+  /* Gradient stops — fire tones */
+  --color-grad-amber: oklch(0.78 0.16 70);
+  --color-grad-orange: oklch(0.72 0.18 50);
+  --color-grad-steel: oklch(0.55 0.08 240);
+  --color-grad-warm: oklch(0.65 0.14 55);
 }
 
 body {
-  background: linear-gradient(135deg, oklch(0.11 0.03 290), oklch(0.13 0.02 320), oklch(0.12 0.015 270));
+  background: linear-gradient(160deg, oklch(0.12 0.015 250), oklch(0.14 0.01 240), oklch(0.13 0.008 260));
   background-attachment: fixed;
   color: var(--color-foreground);
   font-family: var(--font-inter, system-ui, -apple-system, sans-serif);
@@ -36,34 +36,34 @@ body {
 
 /* Glassmorphism utility */
 .glass {
-  background: oklch(0.18 0.015 280 / 0.45);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid oklch(1 0 0 / 0.08);
+  background: oklch(0.19 0.01 250 / 0.45);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid oklch(1 0 0 / 0.07);
 }
 
 .glass-strong {
-  background: oklch(0.16 0.02 280 / 0.7);
-  backdrop-filter: blur(30px) saturate(2);
-  -webkit-backdrop-filter: blur(30px) saturate(2);
-  border: 1px solid oklch(1 0 0 / 0.1);
+  background: oklch(0.17 0.012 250 / 0.7);
+  backdrop-filter: blur(30px) saturate(1.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  border: 1px solid oklch(1 0 0 / 0.09);
 }
 
-/* Gradient text */
+/* Gradient text — fire */
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-grad-pink), var(--color-grad-purple), var(--color-grad-orange));
+  background: linear-gradient(135deg, var(--color-grad-amber), var(--color-grad-orange));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 /* Glow effects */
-.glow-pink {
-  box-shadow: 0 0 20px oklch(0.6 0.28 340 / 0.15), 0 0 60px oklch(0.6 0.28 340 / 0.05);
+.glow-amber {
+  box-shadow: 0 0 20px oklch(0.75 0.17 65 / 0.15), 0 0 60px oklch(0.75 0.17 65 / 0.05);
 }
 
-.glow-purple {
-  box-shadow: 0 0 20px oklch(0.5 0.25 290 / 0.15), 0 0 60px oklch(0.5 0.25 290 / 0.05);
+.glow-steel {
+  box-shadow: 0 0 20px oklch(0.55 0.08 240 / 0.15), 0 0 60px oklch(0.55 0.08 240 / 0.05);
 }
 
 /* Score ring animation */

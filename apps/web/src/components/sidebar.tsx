@@ -25,11 +25,12 @@ export function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col glass-strong">
-      <div className="flex h-16 items-center px-5">
+      <div className="flex h-16 items-center gap-2.5 px-5">
+        <img src="/logo.svg" alt="Forge" className="h-7 w-7" />
         <span className="text-xl font-bold tracking-wider text-gradient">
           FORGE
         </span>
-        <span className="ml-2 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+        <span className="ml-auto rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
           v0.1
         </span>
       </div>
