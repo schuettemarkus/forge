@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, Store, Printer, Shield } from "lucide-react";
+import { Store, Printer, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -13,19 +13,7 @@ const PLATFORMS = [
 
 export default function SettingsPage() {
   return (
-    <div className="max-w-3xl">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 p-2.5">
-          <Settings className="h-5 w-5 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage store connections, printers, and preferences
-          </p>
-        </div>
-      </div>
-
+    <>
       {/* Connected Stores */}
       <section className="mb-8">
         <div className="flex items-center gap-2 mb-4">
@@ -96,6 +84,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

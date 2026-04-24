@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import {
-  Activity,
   Database,
   HardDrive,
   Server,
@@ -10,7 +9,6 @@ import {
   WifiOff,
   RefreshCw,
   CheckCircle,
-  XCircle,
   Clock,
 } from "lucide-react";
 import { fetchApi } from "@/lib/api";
@@ -103,32 +101,19 @@ export default function SystemsPage() {
     : "unknown";
 
   return (
-    <div className="max-w-4xl">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 p-2.5">
-            <Activity className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Systems</h1>
-            <p className="text-sm text-muted-foreground">
-              Health monitoring and service status
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {lastChecked && (
-            <span className="text-[11px] text-muted-foreground/50 flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {lastChecked.toLocaleTimeString()}
-            </span>
-          )}
-          <Button onClick={refresh} disabled={loading} variant="outline" size="sm" className="rounded-xl">
-            <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-        </div>
+    <>
+      {/* Toolbar */}
+      <div className="mb-6 flex items-center justify-end gap-3">
+        {lastChecked && (
+          <span className="text-[11px] text-muted-foreground/50 flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {lastChecked.toLocaleTimeString()}
+          </span>
+        )}
+        <Button onClick={refresh} disabled={loading} variant="outline" size="sm" className="rounded-xl">
+          <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
       </div>
 
       {/* Overall Status Banner */}
@@ -271,6 +256,6 @@ export default function SystemsPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
