@@ -60,13 +60,18 @@ export default function FarmPage() {
           <p className="text-sm text-muted-foreground">Loading printers...</p>
         </div>
       ) : printers.length === 0 && !showAdd ? (
-        <div className="glass rounded-2xl p-8 sm:p-12 text-center">
-          <Cpu className="mx-auto mb-3 h-8 w-8 text-muted-foreground/40" />
-          <p className="text-sm font-medium text-muted-foreground">No printers configured</p>
-          <p className="text-xs text-muted-foreground/60 mt-1">
-            Add your Bambu P1S or invite a friend&apos;s printer
+        <button
+          onClick={() => setShowAdd(true)}
+          className="w-full glass rounded-2xl p-8 sm:p-12 text-center border border-dashed border-white/15 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 group cursor-pointer"
+        >
+          <Plus className="mx-auto mb-3 h-10 w-10 text-muted-foreground/30 group-hover:text-primary/60 transition-colors" />
+          <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground/80 transition-colors">
+            Add your first printer
           </p>
-        </div>
+          <p className="text-xs text-muted-foreground/50 mt-1">
+            Bambu, Prusa, Creality, and more
+          </p>
+        </button>
       ) : (
         <div className="space-y-3">
           {printers.map((printer) => (
@@ -77,6 +82,17 @@ export default function FarmPage() {
               isDeleting={deletePrinter.isPending}
             />
           ))}
+
+          {/* Inline add button — smaller when printers exist */}
+          {!showAdd && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="w-full rounded-2xl border border-dashed border-white/10 hover:border-primary/30 hover:bg-primary/5 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-all duration-200 group"
+            >
+              <Plus className="h-4 w-4 group-hover:text-primary/60 transition-colors" />
+              Add another printer
+            </button>
+          )}
         </div>
       )}
     </div>
