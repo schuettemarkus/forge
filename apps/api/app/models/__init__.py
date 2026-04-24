@@ -11,6 +11,9 @@ from app.models.print_job import PrintJob
 from app.models.order import Order
 from app.models.ledger import LedgerEntry
 from app.models.human_action import HumanAction
+from app.models.operator import Operator
+from app.models.store_connection import StoreConnection
+from app.models.listing_store_link import ListingStoreLink
 
 __all__ = [
     "Base",
@@ -26,4 +29,7 @@ __all__ = [
     "Order",
     "LedgerEntry",
     "HumanAction",
+    "Operator",
+    "StoreConnection",
+    "ListingStoreLink",
 ]

@@ -1,23 +1,72 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: oklch(0.129 0.013 285.75);
-  --color-foreground: oklch(0.967 0.003 264.54);
-  --color-card: oklch(0.178 0.014 285.75);
-  --color-card-foreground: oklch(0.967 0.003 264.54);
-  --color-primary: oklch(0.696 0.17 162.48);
+  /* Instagram-inspired palette */
+  --color-background: oklch(0.13 0.02 280);
+  --color-foreground: oklch(0.97 0.005 280);
+  --color-card: oklch(0.18 0.015 280 / 0.6);
+  --color-card-foreground: oklch(0.97 0.005 280);
+  --color-card-solid: oklch(0.18 0.015 280);
+  --color-primary: oklch(0.65 0.25 330);
   --color-primary-foreground: oklch(1 0 0);
-  --color-muted: oklch(0.279 0.014 285.75);
-  --color-muted-foreground: oklch(0.554 0.014 264.54);
-  --color-destructive: oklch(0.577 0.245 27.33);
-  --color-border: oklch(0.279 0.014 285.75);
-  --color-ring: oklch(0.696 0.17 162.48);
-  --color-warning: oklch(0.768 0.188 84.43);
-  --color-success: oklch(0.696 0.17 162.48);
+  --color-secondary: oklch(0.65 0.22 290);
+  --color-accent: oklch(0.72 0.2 50);
+  --color-muted: oklch(0.25 0.015 280 / 0.5);
+  --color-muted-foreground: oklch(0.6 0.02 280);
+  --color-destructive: oklch(0.6 0.24 25);
+  --color-border: oklch(0.3 0.02 280 / 0.4);
+  --color-ring: oklch(0.65 0.25 330);
+  --color-warning: oklch(0.77 0.17 65);
+  --color-success: oklch(0.7 0.18 155);
+
+  /* Gradient stops */
+  --color-grad-pink: oklch(0.6 0.28 340);
+  --color-grad-purple: oklch(0.5 0.25 290);
+  --color-grad-orange: oklch(0.7 0.2 50);
+  --color-grad-yellow: oklch(0.8 0.18 85);
 }
 
 body {
-  background-color: var(--color-background);
+  background: linear-gradient(135deg, oklch(0.11 0.03 290), oklch(0.13 0.02 320), oklch(0.12 0.015 270));
+  background-attachment: fixed;
   color: var(--color-foreground);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-inter, system-ui, -apple-system, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: oklch(0.18 0.015 280 / 0.45);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid oklch(1 0 0 / 0.08);
+}
+
+.glass-strong {
+  background: oklch(0.16 0.02 280 / 0.7);
+  backdrop-filter: blur(30px) saturate(2);
+  -webkit-backdrop-filter: blur(30px) saturate(2);
+  border: 1px solid oklch(1 0 0 / 0.1);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-grad-pink), var(--color-grad-purple), var(--color-grad-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effects */
+.glow-pink {
+  box-shadow: 0 0 20px oklch(0.6 0.28 340 / 0.15), 0 0 60px oklch(0.6 0.28 340 / 0.05);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px oklch(0.5 0.25 290 / 0.15), 0 0 60px oklch(0.5 0.25 290 / 0.05);
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 100; }
 }

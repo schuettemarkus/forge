@@ -29,3 +29,6 @@ class PrintJob(Base):
     started_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
     filament_used_g: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+
+    # v3: Job routing
+    routed_by: Mapped[str] = mapped_column(String(10), default="auto")  # auto | manual
