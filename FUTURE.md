@@ -221,7 +221,25 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 
 ## v7 Sprint: Two-Sided Marketplace — Sellers & Printers
 
-**Priority: High — transforms Forge from a solo tool into a print fulfillment network**
+**Priority: Future (post-profitability) — build this AFTER solo Forge is generating revenue**
+
+> **Viability analysis (2026-04-24):** The full two-sided marketplace has a cold
+> start problem (need sellers AND printers simultaneously), fintech complexity
+> (Stripe Connect, tax reporting, disputes), and competes with established players
+> (Craftcloud, Shapeways, Treatstock). Solo Forge with one P1S can generate
+> $1,000-1,700/mo at 57% margins from week 1, while the marketplace needs months
+> of development + user acquisition before dollar one.
+>
+> **Recommended path:** Start solo → prove the product engine → hit capacity →
+> add trusted friends as overflow printers (v3 scope) → only then consider
+> opening as a public marketplace. The v3 "distributed printer network" sprint
+> covers 80% of the value with 20% of the complexity. Build v7 only after
+> you have 50+ orders/month and multiple printers maxed out.
+>
+> **Phase the rollout:**
+> - Phase A (v3): Invite-only printer network — you're the only seller, friends print overflow
+> - Phase B (v7-lite): Open printer signups — vetted printers, you still control the catalog
+> - Phase C (v7-full): Open seller signups — full two-sided marketplace with public onboarding
 
 ### Concept
 
