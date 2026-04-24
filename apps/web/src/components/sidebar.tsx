@@ -8,6 +8,7 @@ import {
   Cpu,
   Package,
   DollarSign,
+  Activity,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/farm", label: "Farm", icon: Cpu },
   { href: "/orders", label: "Orders", icon: Package },
   { href: "/finance", label: "Finance", icon: DollarSign },
+  { href: "/systems", label: "Systems", icon: Activity },
 ];
 
 export function Sidebar() {

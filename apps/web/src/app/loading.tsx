@@ -1,0 +1,12 @@
+import { RefreshCw } from "lucide-react";
+
+export default function Loading() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="text-center">
+        <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-primary/50" />
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      </div>
+    </div>
+  );
+}
