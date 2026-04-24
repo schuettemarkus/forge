@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Sidebar } from "@/components/sidebar";
+import { QueryProvider } from "@/lib/query-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} antialiased`}>
-        <Sidebar />
-        <main className="min-h-screen pt-14 px-4 pb-6 lg:pt-0 lg:ml-56 lg:p-6">
-          {children}
-        </main>
+        <QueryProvider>
+          <Sidebar />
+          <main className="min-h-screen pt-14 px-4 pb-6 lg:pt-0 lg:ml-56 lg:p-6">
+            {children}
+          </main>
+        </QueryProvider>
       </body>
     </html>
   );

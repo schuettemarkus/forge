@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.routers import auth, health, opportunities, trends, scoring
+from app.routers import auth, health, opportunities, printers, trends, scoring
 
 structlog.configure(
     processors=[
@@ -71,5 +71,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 app.include_router(health.router)
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(opportunities.router, prefix="/opportunities", tags=["opportunities"])
+app.include_router(printers.router, prefix="/printers", tags=["printers"])
 app.include_router(trends.router, prefix="/trends", tags=["trends"])
 app.include_router(scoring.router, prefix="/scoring", tags=["scoring"])
