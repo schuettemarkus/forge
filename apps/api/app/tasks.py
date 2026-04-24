@@ -34,32 +34,30 @@ def _run_async(coro):
         loop.close()
 
 
-@celery.task(name="forge.run_all_scrapers", bind=True, max_retries=2)
+@celery.task(name="forge.run_all_scrapers", bind=True, max_retries=2, time_limit=300)
 def run_all_scrapers(self) -> Dict[str, int]:
-    """Run all trend scrapers and return signal counts."""
+    """Run all trend scrapers in parallel and return signal counts."""
     logger.info("task.scrapers.starting")
-    results: Dict[str, int] = {}
 
     async def _run():
         async with async_session() as db:
-            for scraper in SCRAPERS:
+            async def run_one(scraper):  # type: ignore
                 try:
                     count = await scraper.run(db)
-                    results[scraper.source_name] = count
+                    return scraper.source_name, count
                 except Exception as e:
-                    logger.error(
-                        "task.scraper.failed",
-                        source=scraper.source_name,
-                        error=str(e),
-                    )
-                    results[scraper.source_name] = 0
+                    logger.error("task.scraper.failed", source=scraper.source_name, error=str(e))
+                    return scraper.source_name, 0
 
-    _run_async(_run())
+            completed = await asyncio.gather(*[run_one(s) for s in SCRAPERS])
+            return {name: count for name, count in completed}
+
+    results = _run_async(_run())
     logger.info("task.scrapers.completed", results=results)
     return results
 
 
-@celery.task(name="forge.run_scorer", bind=True, max_retries=2)
+@celery.task(name="forge.run_scorer", bind=True, max_retries=2, time_limit=600)
 def run_scorer(self) -> int:
     """Run the opportunity scorer on recent trend signals."""
     logger.info("task.scorer.starting")
@@ -74,7 +72,7 @@ def run_scorer(self) -> int:
     return count
 
 
-@celery.task(name="forge.scrape_and_score")
+@celery.task(name="forge.scrape_and_score", time_limit=900)
 def scrape_and_score() -> Dict[str, object]:
     """Full pipeline: run all scrapers then score. This is the daily cron task."""
     scraper_results = run_all_scrapers()
@@ -89,6 +87,6 @@ def scrape_and_score() -> Dict[str, object]:
 celery.conf.beat_schedule = {
     "daily-scrape-and-score": {
         "task": "forge.scrape_and_score",
-        "schedule": 86400.0,  # 24 hours
+        "schedule": 86400.0,
     },
 }

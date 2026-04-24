@@ -84,7 +84,8 @@ async def trigger_scrape(
     db: AsyncSession = Depends(get_db),
     _user: dict = Depends(require_owner),
 ) -> Dict[str, object]:
-    """Manually trigger all scrapers. Requires owner role."""
+    """Manually trigger all scrapers in parallel. Requires owner role."""
+    import asyncio
     from app.scrapers.google_trends import GoogleTrendsScraper
     from app.scrapers.reddit import RedditScraper
     from app.scrapers.etsy import EtsyScraper
@@ -99,12 +100,13 @@ async def trigger_scrape(
         RedditScraper(),
     ]
 
-    results: Dict[str, int] = {}
-    for scraper in scrapers:
+    async def run_scraper(scraper):  # type: ignore
         try:
-            count = await scraper.run(db)
-            results[scraper.source_name] = count
+            return scraper.source_name, await scraper.run(db)
         except Exception:
-            results[scraper.source_name] = 0
+            return scraper.source_name, 0
+
+    completed = await asyncio.gather(*[run_scraper(s) for s in scrapers])
+    results = {name: count for name, count in completed}
 
     return {"status": "completed", "signals": results}

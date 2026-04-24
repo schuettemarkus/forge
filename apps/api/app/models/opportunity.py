@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from sqlalchemy import Float, String, Text
+from sqlalchemy import Float, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -11,7 +11,7 @@ from app.models.base import Base
 class Opportunity(Base):
     __tablename__ = "opportunity"
 
-    concept: Mapped[str] = mapped_column(String(500))
+    concept: Mapped[str] = mapped_column(String(500), index=True)
     score: Mapped[float] = mapped_column(Float, default=0.0)
     demand: Mapped[float] = mapped_column(Float, default=0.0)
     competition: Mapped[float] = mapped_column(Float, default=0.0)
@@ -19,4 +19,9 @@ class Opportunity(Base):
     margin_est: Mapped[float] = mapped_column(Float, default=0.0)
     rationale_md: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     ip_status: Mapped[str] = mapped_column(String(20), default="pending")
-    status: Mapped[str] = mapped_column(String(20), default="pending")
+    status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+
+    __table_args__ = (
+        Index("ix_opp_deleted_status", "deleted_at", "status"),
+        Index("ix_opp_deleted_score", "deleted_at", "score"),
+    )

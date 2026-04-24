@@ -51,7 +51,7 @@ class BaseScraper(ABC):
                 raw_key = f"raw/{self.source_name}/{now.strftime('%Y/%m/%d')}/{uuid4().hex}.json"
                 raw_bytes = json.dumps(signal.get("raw", {}), default=str).encode()
                 try:
-                    storage.upload_file(raw_key, raw_bytes, "application/json")
+                    await storage.upload_file_async(raw_key, raw_bytes, "application/json")
                 except Exception:
                     raw_key = None
                     logger.warning("scraper.storage_failed", source=self.source_name)
