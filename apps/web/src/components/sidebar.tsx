@@ -12,8 +12,11 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
   { href: "/opportunities", label: "Opportunities", icon: Lightbulb },
@@ -25,6 +28,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { isAuthenticated, email, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
   // Close mobile menu on route change
@@ -100,7 +104,7 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="border-t border-border p-3">
+        <div className="border-t border-border p-3 space-y-1">
           <Link
             href="/settings"
             className={cn(
@@ -113,7 +117,34 @@ export function Sidebar() {
             <Settings className={cn("h-5 w-5 lg:h-4 lg:w-4", pathname.startsWith("/settings") && "text-primary")} />
             Settings
           </Link>
-          <div className="flex items-center gap-2 px-3 py-2 mt-1">
+
+          {isAuthenticated ? (
+            <div className="flex items-center justify-between px-3 py-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-[11px] text-muted-foreground truncate">
+                  {email}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                className="text-muted-foreground/50 hover:text-destructive transition-colors shrink-0 ml-1"
+                title="Sign out"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
+            >
+              <User className="h-4 w-4" />
+              Sign In
+            </Link>
+          )}
+
+          <div className="flex items-center gap-2 px-3 py-1">
             <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
             <span className="text-[11px] text-muted-foreground">System Online</span>
           </div>

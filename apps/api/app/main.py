@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.routers import auth, health, opportunities, printers, trends, scoring
+from app.routers import settings as settings_router
 
 structlog.configure(
     processors=[
@@ -72,5 +73,6 @@ app.include_router(health.router)
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(opportunities.router, prefix="/opportunities", tags=["opportunities"])
 app.include_router(printers.router, prefix="/printers", tags=["printers"])
+app.include_router(settings_router.router, prefix="/settings", tags=["settings"])
 app.include_router(trends.router, prefix="/trends", tags=["trends"])
 app.include_router(scoring.router, prefix="/scoring", tags=["scoring"])
