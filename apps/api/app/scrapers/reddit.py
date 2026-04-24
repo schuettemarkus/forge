@@ -45,20 +45,14 @@ class RedditScraper(BaseScraper):
     def _fetch_subreddit(self, subreddit_name: str) -> List[dict]:
         import praw
 
-        # Use read-only mode if no credentials configured
-        if not settings.ETSY_API_KEY:
-            # PRAW can work in read-only with just a user agent
-            reddit = praw.Reddit(
-                client_id=getattr(settings, "REDDIT_CLIENT_ID", "") or "forge-scraper",
-                client_secret=getattr(settings, "REDDIT_CLIENT_SECRET", "") or "",
-                user_agent="forge-trend-scraper/0.1 (by /u/forge-bot)",
-            )
-        else:
-            reddit = praw.Reddit(
-                client_id=getattr(settings, "REDDIT_CLIENT_ID", ""),
-                client_secret=getattr(settings, "REDDIT_CLIENT_SECRET", ""),
-                user_agent="forge-trend-scraper/0.1 (by /u/forge-bot)",
-            )
+        reddit_client_id = getattr(settings, "REDDIT_CLIENT_ID", "") or ""
+        reddit_client_secret = getattr(settings, "REDDIT_CLIENT_SECRET", "") or ""
+
+        reddit = praw.Reddit(
+            client_id=reddit_client_id or "forge-scraper",
+            client_secret=reddit_client_secret,
+            user_agent="forge-trend-scraper/0.1 (by /u/forge-bot)",
+        )
 
         signals: List[dict] = []
         subreddit = reddit.subreddit(subreddit_name)

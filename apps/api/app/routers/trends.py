@@ -5,10 +5,11 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import get_current_user, require_owner
 from app.db import get_db
 from app.models.trend import TrendSignal
 
@@ -35,14 +36,16 @@ class TrendSummary(BaseModel):
 
 @router.get("/", response_model=List[TrendSignalOut])
 async def list_trends(
-    source: Optional[str] = None,
-    limit: int = 50,
+    source: Optional[str] = Query(None, max_length=50),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
 ) -> List[TrendSignalOut]:
     query = select(TrendSignal).where(TrendSignal.deleted_at.is_(None))
     if source:
         query = query.where(TrendSignal.source == source)
-    query = query.order_by(TrendSignal.velocity.desc()).limit(limit)
+    query = query.order_by(TrendSignal.velocity.desc()).limit(limit).offset(offset)
     result = await db.execute(query)
     return [TrendSignalOut.model_validate(r) for r in result.scalars().all()]
 
@@ -50,14 +53,13 @@ async def list_trends(
 @router.get("/summary", response_model=TrendSummary)
 async def trend_summary(
     db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
 ) -> TrendSummary:
-    # Total count
     total_result = await db.execute(
         select(func.count(TrendSignal.id)).where(TrendSignal.deleted_at.is_(None))
     )
     total = total_result.scalar() or 0
 
-    # Count by source
     source_result = await db.execute(
         select(TrendSignal.source, func.count(TrendSignal.id))
         .where(TrendSignal.deleted_at.is_(None))
@@ -65,7 +67,6 @@ async def trend_summary(
     )
     by_source = {row[0]: row[1] for row in source_result.all()}
 
-    # Latest capture
     latest_result = await db.execute(
         select(func.max(TrendSignal.captured_at))
     )
@@ -81,8 +82,9 @@ async def trend_summary(
 @router.post("/scrape")
 async def trigger_scrape(
     db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(require_owner),
 ) -> Dict[str, object]:
-    """Manually trigger all scrapers (synchronous for now, async via Celery when Redis available)."""
+    """Manually trigger all scrapers. Requires owner role."""
     from app.scrapers.google_trends import GoogleTrendsScraper
     from app.scrapers.reddit import RedditScraper
     from app.scrapers.etsy import EtsyScraper
@@ -102,7 +104,7 @@ async def trigger_scrape(
         try:
             count = await scraper.run(db)
             results[scraper.source_name] = count
-        except Exception as e:
+        except Exception:
             results[scraper.source_name] = 0
 
     return {"status": "completed", "signals": results}

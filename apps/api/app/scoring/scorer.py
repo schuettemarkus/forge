@@ -13,20 +13,31 @@ from app.models.trend import TrendSignal
 
 logger = structlog.get_logger()
 
-# Import blocklists
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../../packages"))
-try:
-    from shared.constants import (
-        EXCLUDED_CATEGORIES,
-        IP_BLOCKLIST,
-        MARGIN_FLOOR_PCT,
-    )
-except ImportError:
-    IP_BLOCKLIST = ["disney", "pokemon", "nintendo", "marvel", "star wars"]
-    EXCLUDED_CATEGORIES = ["firearms", "weapons", "religious", "political", "adult"]
-    MARGIN_FLOOR_PCT = 40
+# Blocklists — kept in-module to avoid sys.path manipulation.
+# Canonical source: packages/shared/constants.py
+IP_BLOCKLIST = [
+    "disney", "marvel", "dc comics", "batman", "superman", "spider-man",
+    "pokemon", "pikachu", "nintendo", "mario", "zelda", "kirby",
+    "star wars", "lucasfilm", "mandalorian", "baby yoda", "grogu",
+    "harry potter", "hogwarts", "wizarding world",
+    "hello kitty", "sanrio", "pusheen",
+    "lego", "barbie", "hot wheels", "transformers", "gi joe",
+    "my little pony", "care bears", "sesame street",
+    "mickey mouse", "frozen", "elsa", "moana", "pixar",
+    "nfl", "nba", "mlb", "nhl", "fifa", "mls",
+    "coca-cola", "pepsi", "nike", "adidas", "supreme",
+    "louis vuitton", "gucci", "chanel", "hermes",
+    "apple", "google", "tesla", "ferrari", "lamborghini",
+    "fortnite", "minecraft", "roblox", "among us",
+    "one piece", "naruto", "dragon ball",
+    "spongebob", "paw patrol", "peppa pig",
+]
+EXCLUDED_CATEGORIES = [
+    "firearms", "weapons", "gun accessories", "ammunition",
+    "religious", "political", "adult", "drug paraphernalia",
+    "tobacco", "vaping", "knives", "brass knuckles",
+]
+MARGIN_FLOOR_PCT = 40
 
 
 class OpportunityScorer:
