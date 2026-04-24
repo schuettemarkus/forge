@@ -8,7 +8,7 @@ export default function OrdersPage() {
         <h1 className="text-xl sm:text-2xl font-bold">Orders</h1>
       </div>
 
-      <div className="rounded-lg border border-border bg-card p-8 sm:p-12 text-center">
+      <div className="glass rounded-2xl p-8 sm:p-12 text-center">
         <Package className="mx-auto mb-4 h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground/50" />
         <p className="text-lg font-medium text-muted-foreground">
           No orders yet
