@@ -17,9 +17,116 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 
 ---
 
-## v2 Sprint: User Profile, Settings & Data Persistence
+# Sprint Roadmap (Reprioritized 2026-04-24)
 
-**Priority: High — foundational for multi-session reliability**
+## Completed Sprints
+
+- **M0: Skeleton** — monorepo, 15 DB tables, Docker/Makefile, FastAPI + Next.js
+- **M1: Trend Intelligence** — 5 scrapers, opportunity scorer, 23 live opportunities
+- **v2: Profiles & Persistence** — login, auth context, TanStack Query, printer CRUD, settings API
+- **v3: Store Connectors (data model)** — plugin architecture, Etsy/Shopify/Manual connectors, store_connection table
+- **v4: Security** — JWT auth, input validation, error handling, CORS, scraper fixes
+- **v5: Performance** — parallel scrapers, 7 DB indexes, async storage, pool tuning
+- **v6: QA System** — 19 tests, health probes, monitoring page, CI pipeline
+
+---
+
+## NEXT UP: v8 Sprint — Product Pipeline (Design → List → Sell)
+
+**Priority: CRITICAL — this is the revenue path. Nothing else matters until this works.**
+
+> Without this sprint, Forge is a research tool that finds trending products but
+> can't make or sell them. This sprint closes the loop from "opportunity scored"
+> to "money in the bank."
+
+### Feature 1: Design Generation (Opportunity → Printable File)
+
+The "Design" button on opportunities currently does nothing. After this sprint, clicking it generates a printable 3MF/STL file.
+
+**What gets built:**
+- `design_pipeline` service orchestrating the three generation paths:
+  - **Parametric (preferred):** CadQuery/OpenSCAD templates for 5 starter categories: organizer, planter, hook, phone stand, cookie cutter. LLM fills parameters (size, style) from the opportunity concept.
+  - **AI generation (fallback):** Meshy API integration for concepts that don't fit templates. Send concept description → receive mesh → validate.
+- Printability gate on every generated file:
+  - Mesh integrity check (manifold, no holes) via trimesh
+  - Bounding box validation against P1S build plate (256x256x256mm)
+  - Wall thickness check (≥1.2mm)
+  - Slicer dry-run to extract: estimated print time, filament grams, cost
+- QA report saved to `qa_report` table with pass/fail + cost breakdown
+- Dashboard: "Design" button triggers generation → shows progress → displays result with render + cost + time estimate
+- Status flow: opportunity `pending` → `designing` → design `ready` or `failed`
+
+**API endpoints:**
+- `POST /designs/generate/{opportunity_id}` — trigger design generation
+- `GET /designs/{design_id}` — get design with QA report
+- `GET /designs/?opportunity_id=X` — list designs for an opportunity
+
+**Files:** `apps/api/app/services/design_pipeline.py`, `apps/api/app/services/parametric/`, `apps/api/app/routers/designs.py`
+
+### Feature 2: Listing Creation (Design → Live on Etsy)
+
+Once a design passes QA, generate marketplace-ready copy + images and publish.
+
+**What gets built:**
+- `listing_generator` service:
+  - Claude API generates: title (SEO, ≤140 chars), description (features, dimensions, materials, care), 13 tags from trend signals
+  - Pricing engine: cost estimate × (1 + margin_target) × competition adjustment, rounded to psychological price points ($X.99), never below cost + 40%
+  - Product images: for v8, use the 3D render from design generation (turntable views). Lifestyle compositing is a future enhancement.
+- Listing review screen in dashboard:
+  - Preview card showing: title, description, tags, price, renders, cost breakdown
+  - Edit any field before publishing
+  - "Publish" button pushes to connected store via connector's `sync_listing()`
+- Etsy connector `sync_listing()` actually implemented (currently a stub)
+- Status flow: design `ready` → listing `draft` → operator reviews → `published`
+
+**API endpoints:**
+- `POST /listings/generate/{design_id}` — generate copy + price + images
+- `PUT /listings/{listing_id}` — edit before publish
+- `POST /listings/{listing_id}/publish` — push to connected store
+
+**Files:** `apps/api/app/services/listing_generator.py`, `apps/api/app/services/pricing.py`, enhanced `apps/api/app/routers/listings.py`
+
+### Feature 3: Order Fulfillment (Order → Print → Ship)
+
+Once a listing is live, handle incoming orders end-to-end.
+
+**What gets built:**
+- Order webhook receiver:
+  - `POST /webhooks/etsy` and `POST /webhooks/shopify` — receive order notifications
+  - Validate, deduplicate (idempotent on external_id), persist to `order` table
+  - Auto-create `print_job` linked to the order's SKU → design → gcode
+- Job routing to printer:
+  - Match order's design requirements to available printers
+  - For v8 (single printer): assign to the one configured P1S
+  - Update printer status, enqueue job
+- Fulfillment flow:
+  - Dashboard orders page shows real orders with status timeline
+  - Mark as "printing" → "printed" → generate shipping label (Shippo API stub) → "shipped"
+  - Enter tracking number → pushes to marketplace via connector's `update_tracking()`
+- Ledger entries: every order creates cost/revenue records for P&L tracking
+
+**API endpoints:**
+- `POST /webhooks/{platform}` — order webhook (unauthenticated, signature-verified)
+- `GET /orders/` — list with status filters (enhanced from current stub)
+- `PUT /orders/{order_id}/status` — update fulfillment status
+- `POST /orders/{order_id}/ship` — generate label + mark shipped
+
+**Files:** `apps/api/app/routers/webhooks.py`, `apps/api/app/services/fulfillment.py`, enhanced `apps/api/app/routers/orders.py`
+
+### Sprint Sequencing (3 weeks)
+
+| Week | Deliverable | Acceptance Test |
+|------|-------------|-----------------|
+| 1 | Design generation + parametric templates + QA gate | Click "Design" on an opportunity → get a printable file with cost estimate in <90s |
+| 2 | Listing generator + review screen + Etsy publish | Approve a design → see listing preview → publish to Etsy sandbox |
+| 3 | Order webhooks + fulfillment flow + shipping | Test order from Etsy → appears in dashboard → mark shipped → tracking pushed back |
+
+---
+
+## Remaining Sprints (reprioritized)
+
+### v3 Remaining: Distributed Printer Network
+**Priority: After first sales — scale when you hit P1S capacity**
 
 ### Profile, Login & Settings
 - User profile with login/auth (upgrade from single-operator magic link to full account system)
@@ -42,9 +149,7 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 
 ---
 
-## v3 Sprint: Universal Store Connector + Distributed Printer Network
-
-**Priority: High — transforms Forge from single-operator to distributed print network**
+## ~~v3 Sprint: Universal Store Connector~~ DATA MODEL COMPLETED — remaining work below
 
 ### Universal Store Connector
 - Connect to ANY online store via a plugin pattern (not just Etsy/Shopify)
@@ -75,9 +180,7 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 
 ---
 
-## v4 Sprint: Security Hardening
-
-**Priority: Critical — must complete before any production deployment**
+## ~~v4 Sprint: Security Hardening~~ COMPLETED
 
 ### Authentication & Authorization
 - Implement real JWT auth (replace stub magic-link/verify endpoints that currently return hardcoded tokens)
@@ -123,9 +226,7 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 
 ---
 
-## v5 Sprint: Performance & Speed
-
-**Priority: High — essential for responsive dashboard and efficient resource usage**
+## ~~v5 Sprint: Performance & Speed~~ COMPLETED
 
 ### Database Optimization
 - Add indexes on hot query paths: `(deleted_at, status)` on opportunity, `(source, captured_at)` on trend_signal, `concept` on opportunity
@@ -167,9 +268,7 @@ Ideas that came up but don't belong in v1. Revisit after the system is profitabl
 
 ---
 
-## v6 Sprint: QA System & Reliability
-
-**Priority: High — zero test coverage today, need automated quality gates**
+## ~~v6 Sprint: QA System & Reliability~~ COMPLETED
 
 ### Test Suite (currently 0% coverage)
 - **API unit tests** (pytest): test every router endpoint (happy path + error cases), test scorer logic with fixture data, test IP blocklist filtering, test store connector registry
